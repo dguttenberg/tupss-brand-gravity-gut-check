@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCP · SLT · Brand Gravity (Simplified)</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a14; --bg2: #10101e; --surface: #15152a;
+  --rule: #2a2a44; --text: #f0f0f8; --muted: #b5b5d0;
+  --green: #00e87a; --cyan: #00c8e8; --amber: #f59e0b;
+}
+html, body { width:100%; height:100%; background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif; overflow:hidden; }
+
+/* ── Nav bar ── */
+.nav {
+  position:fixed; top:0; left:0; right:0; height:48px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 40px; background:rgba(10,10,20,0.92);
+  border-bottom:1px solid var(--rule); backdrop-filter:blur(8px); z-index:100;
+}
+.nav-brand { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+.nav-brand em { font-style:normal; color:var(--green); }
+.nav-right { display:flex; align-items:center; gap:20px; }
+.nav-dots { display:flex; gap:6px; }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--rule); cursor:pointer; transition:all 0.2s; }
+.dot.on { background:var(--green); transform:scale(1.4); }
+.dot:hover { background:var(--muted); }
+.nav-hint { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:0.1em; }
+.counter { position:fixed; bottom:22px; right:36px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:0.1em; z-index:100; opacity:0.65; }
+
+/* ── Deck / slide framework ── */
+.deck { position:fixed; inset:0; overflow:hidden; }
+.slide {
+  position:absolute; inset:0; padding:88px 80px 56px;
+  display:flex; flex-direction:column; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.45s ease;
+}
+.slide.on { opacity:1; pointer-events:all; }
+.slide.fullbleed { padding:0; overflow:hidden; }
+.bg {
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,#0a0a14 0%,#0d0a1e 55%,#12091a 100%);
+  z-index:-2;
+}
+.glow { position:absolute; border-radius:50%; filter:blur(130px); z-index:-1; pointer-events:none; }
+
+.ey {
+  font-family:'IBM Plex Mono',monospace; font-size:12px;
+  letter-spacing:0.22em; text-transform:uppercase; color:var(--green);
+  margin-bottom:24px; display:flex; align-items:center; gap:12px;
+}
+.ey::before { content:''; display:block; width:24px; height:1px; background:currentColor; }
+
+@keyframes fade-up { from{opacity:0;transform:translateY(18px);} to{opacity:1;transform:translateY(0);} }
+
+/* ── S1: THREE TRUTHS ── */
+.truths-grid {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:56px;
+  height:100%; align-items:center; padding:30px 0 50px;
+}
+.truth-col {
+  display:flex; flex-direction:column; justify-content:flex-start;
+  animation:fade-up 0.6s ease both;
+}
+.truth-col:nth-child(1) { animation-delay:0.05s; }
+.truth-col:nth-child(2) { animation-delay:0.18s; }
+.truth-col:nth-child(3) { animation-delay:0.31s; }
+.truth-eyebrow {
+  font-family:'IBM Plex Mono',monospace; font-size:11px;
+  letter-spacing:0.22em; text-transform:uppercase; color:var(--green);
+  margin-bottom:30px; line-height:1.5;
+}
+.truth-eyebrow::before {
+  content:''; display:block; width:30px; height:1px; background:currentColor; margin-bottom:14px;
+}
+.truth-stat {
+  font-family:'Barlow Condensed',sans-serif; font-weight:800;
+  font-size:200px; line-height:0.88; letter-spacing:-0.03em;
+  color:var(--green); margin-bottom:30px;
+}
+.truth-stat .pct { font-size:140px; letter-spacing:0; }
+.truth-stat .lt  { font-size:140px; letter-spacing:0; vertical-align:8px; margin-right:4px; color:rgba(0,232,122,0.85); }
+.truth-stat-text {
+  font-family:'Barlow Condensed',sans-serif; font-weight:800;
+  font-size:88px; line-height:0.88; letter-spacing:-0.02em;
+  color:var(--green); margin-bottom:30px; text-transform:uppercase;
+}
+.truth-stat-text em { font-style:normal; color:var(--green); }
+.truth-body { font-size:18px; line-height:1.55; color:var(--muted); }
+.truth-body strong { color:var(--text); font-weight:500; }
+.truths-source {
+  position:absolute; bottom:28px; left:80px; right:80px;
+  font-family:'IBM Plex Mono',monospace; font-size:10px;
+  letter-spacing:0.14em; color:var(--muted); opacity:0.6;
+  text-transform:uppercase;
+}
+
+/* ── S2: 5x CONTENT / COHERENCE ── */
+.fivex-wrap {
+  display:grid; grid-template-columns:minmax(0,0.85fr) minmax(0,1fr);
+  gap:60px; align-items:center; height:100%; padding-top:10px;
+}
+.fivex-stat {
+  font-family:'Barlow Condensed',sans-serif; font-weight:800;
+  font-size:380px; line-height:0.85; letter-spacing:-0.04em;
+  color:var(--green);
+  text-align:center;
+}
+.fivex-headline {
+  font-family:'Barlow Condensed',sans-serif; font-weight:800;
+  font-size:62px; line-height:0.97; letter-spacing:-0.015em;
+  text-transform:uppercase; color:var(--text); margin-bottom:36px;
+}
+.fivex-headline em { font-style:normal; color:var(--green); }
+.fivex-coherence {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700;
+  font-size:46px; line-height:1; letter-spacing:-0.01em;
+  text-transform:uppercase; color:var(--cyan);
+  padding-top:32px; border-top:1px solid var(--rule);
+}
+
+/* ── S3: ICEBERG (full-bleed SVG, waterline across whole page) ── */
+.iceberg-slide { padding:0 !important; overflow:hidden; }
+.iceberg-bg { position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+.iceberg-text {
+  position:absolute; right:80px; max-width:520px;
+  z-index:5; text-align:right;
+}
+.iceberg-text.top { top:130px; }
+.iceberg-text.bottom { bottom:120px; }
+.iceberg-eyebrow {
+  font-family:'IBM Plex Mono',monospace; font-size:13px;
+  letter-spacing:0.32em; text-transform:uppercase;
+  margin-bottom:14px;
+}
+.iceberg-text.top .iceberg-eyebrow { color:var(--green); }
+.iceberg-text.bottom .iceberg-eyebrow { color:var(--cyan); }
+.iceberg-headline {
+  font-family:'Barlow Condensed',sans-serif; font-size:56px;
+  font-weight:800; line-height:0.98; letter-spacing:-0.01em;
+  text-transform:uppercase; color:var(--text); margin-bottom:14px;
+}
+.iceberg-body { font-size:17px; line-height:1.55; color:var(--muted); }
+
+/* ── PROOF cards (Gravity, slide 5) ── */
+.proof-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.proof-card { padding:22px 26px; background:var(--bg2); border:1px solid var(--rule); border-radius:3px; border-top:2px solid var(--green); }
+.proof-card-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; }
+.proof-card-name { font-family:'Barlow Condensed',sans-serif; font-size:30px; font-weight:700; text-transform:uppercase; color:var(--green); letter-spacing:0.04em; }
+.proof-card-status { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted); }
+.proof-card-img {
+  width:100%; aspect-ratio:16/9; object-fit:cover; object-position:center top;
+  border:1px solid rgba(0,232,122,0.25); border-radius:3px;
+  margin-bottom:14px; background:#000; display:block;
+}
+.proof-card-body { font-size:15px; line-height:1.6; color:var(--muted); }
+.proof-card-body strong { color:var(--text); font-weight:500; }
+
+/* ── Forces (slide 6) custom ── */
+.forces-wrap-clean { display:grid; grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr); gap:60px; align-items:center; height:100%; padding-top:30px; }
+.forces-head { font-family:'Barlow Condensed',sans-serif; font-size:60px; font-weight:800; text-transform:uppercase; line-height:0.98; margin-bottom:0; letter-spacing:-0.01em; }
+.forces-head em { font-style:normal; color:var(--green); }
+
+/* ── VEL proof cards (slide 8) ── */
+.vel-cards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; }
+.vel-card {
+  background:var(--bg2); border:1px solid var(--rule); border-top:2px solid var(--cyan);
+  border-radius:3px; padding:18px 20px; display:flex; flex-direction:column; gap:12px;
+}
+.vel-card-name { font-family:'Barlow Condensed',sans-serif; font-size:24px; font-weight:700; text-transform:uppercase; color:var(--cyan); letter-spacing:0.04em; }
+.vel-card-img, .vel-card-vid {
+  width:100%; aspect-ratio:16/9; object-fit:cover; object-position:center top;
+  border:1px solid rgba(0,200,232,0.3); border-radius:3px;
+  background:#000; display:block;
+}
+.vel-card-desc { font-size:13px; line-height:1.55; color:var(--muted); }
+.vel-card-desc strong { color:var(--text); font-weight:500; }
+
+/* ── Ways to Engage (slide 9) ── */
+.com-head { font-family:'Barlow Condensed',sans-serif; font-size:64px; font-weight:800; text-transform:uppercase; line-height:0.98; margin-bottom:36px; letter-spacing:-0.01em; }
+.com-head em { font-style:normal; color:var(--green); }
+.com-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+.com-card { background:var(--bg2); border:1px solid var(--rule); border-radius:3px; padding:30px 32px; }
+.com-card.gravity { border-top:2px solid var(--green); }
+.com-card.transactional { border-top:2px solid var(--muted); }
+.com-card-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.com-card-name { font-family:'Barlow Condensed',sans-serif; font-size:30px; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; margin-bottom:24px; }
+.com-card.gravity .com-card-name { color:var(--green); }
+.com-mode { margin-bottom:18px; }
+.com-mode:last-child { margin-bottom:0; }
+.com-mode-label { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.com-mode-body { font-size:15px; line-height:1.55; color:var(--text); font-weight:300; }
+
+/* ── Compounding (slide 10) ── */
+.compound-wrap {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  height:100%; gap:30px;
+}
+.compound-head {
+  font-family:'Barlow Condensed',sans-serif; font-size:62px;
+  font-weight:800; line-height:0.97; letter-spacing:-0.015em;
+  text-transform:uppercase; text-align:center; max-width:1180px;
+}
+.compound-head em { font-style:normal; color:var(--green); }
+.compound-fig { width:100%; max-width:1100px; flex:1; }
+.compound-fig svg { width:100%; height:100%; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">DCP &middot; <em>Brand Gravity</em></div>
+  <div class="nav-right">
+    <div class="nav-dots" id="dots"></div>
+    <div class="nav-hint">&larr; &rarr; to navigate</div>
+  </div>
+</nav>
+<div class="counter" id="ctr">1 / 10</div>
+
+<div class="deck">
+
+<!-- ═══ S1: THREE TRUTHS ═══ -->
+<div class="slide" id="s1">
+  <div class="bg"></div>
+  <div class="glow" style="background:rgba(0,232,122,0.06);width:700px;height:700px;top:-200px;right:-150px;"></div>
+
+  <div class="truths-grid">
+    <div class="truth-col">
+      <div class="truth-eyebrow">Our audience now has<br>an intermediary</div>
+      <div class="truth-stat">4.4x</div>
+      <div class="truth-body"><strong>AI-referred shoppers convert</strong> vs traditional search.</div>
+    </div>
+
+    <div class="truth-col">
+      <div class="truth-eyebrow">Attention is everywhere</div>
+      <div class="truth-stat-text">There is<br>no main<br>channel.</div>
+      <div class="truth-body">Brands are expected to feel native on more channels than ever.</div>
+    </div>
+
+    <div class="truth-col">
+      <div class="truth-eyebrow">This is happening fast</div>
+      <div class="truth-stat-text">25 years<br>&rarr; 18 months.</div>
+      <div class="truth-body">What Google took 25 years to build in category influence has taken 18 months for LLMs.</div>
+    </div>
+  </div>
+
+  <div class="truths-source">
+    Sources: Adobe AI Shopping Trends &middot; GWI Gen Z Behavioral &middot; LLM adoption velocity (BetterBriefs / CreativeX)
+  </div>
+</div>
+
+<!-- ═══ S2: 5x CONTENT / COHERENCE ═══ -->
+<div class="slide" id="s2">
+  <div class="bg"></div>
+  <div class="glow" style="background:rgba(0,232,122,0.07);width:700px;height:700px;top:50%;left:-200px;transform:translateY(-50%);"></div>
+
+  <div class="fivex-wrap">
+    <div class="fivex-stat">5x</div>
+    <div>
+      <div class="fivex-headline">Brands will produce<br><em>5x more content</em><br>over the next 2 years.</div>
+      <div class="fivex-coherence">Brand coherence is more<br>important than ever.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S3: ICEBERG (full-bleed, waterline across page) ═══ -->
+<div class="slide iceberg-slide" id="s3">
+  <svg class="iceberg-bg" viewBox="0 0 1400 760" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="ic-skyG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#0a0a14"/>
+        <stop offset="1" stop-color="#0d1a36"/>
+      </linearGradient>
+      <linearGradient id="ic-waterG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#0d3a5c"/>
+        <stop offset="1" stop-color="#04111c"/>
+      </linearGradient>
+      <linearGradient id="ic-tip" x1="0.5" y1="0" x2="0.5" y2="1">
+        <stop offset="0" stop-color="#ffffff"/>
+        <stop offset="1" stop-color="#a8c8da"/>
+      </linearGradient>
+      <linearGradient id="ic-body" x1="0.5" y1="0" x2="0.5" y2="1">
+        <stop offset="0" stop-color="#5c9cb8" stop-opacity="0.78"/>
+        <stop offset="0.6" stop-color="#2a6082" stop-opacity="0.5"/>
+        <stop offset="1" stop-color="#0e2638" stop-opacity="0.18"/>
+      </linearGradient>
+      <radialGradient id="ic-glow" cx="50%" cy="55%" r="55%">
+        <stop offset="0" stop-color="#00c8e8" stop-opacity="0.16"/>
+        <stop offset="0.7" stop-color="#00c8e8" stop-opacity="0.04"/>
+        <stop offset="1" stop-color="#00c8e8" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Sky and water bands extend the full viewBox width -->
+    <rect x="0" y="0" width="1400" height="350" fill="url(#ic-skyG)"/>
+    <rect x="0" y="350" width="1400" height="410" fill="url(#ic-waterG)"/>
+
+    <!-- Glow behind iceberg, anchored bottom-left -->
+    <ellipse cx="430" cy="540" rx="340" ry="220" fill="url(#ic-glow)"/>
+
+    <!-- Underwater body: rounded mass, lower-left position -->
+    <path d="M 220 350
+             L 360 350
+             L 395 330
+             L 430 320
+             L 465 330
+             L 500 350
+             L 640 350
+             Q 705 400 715 490
+             Q 712 590 660 660
+             Q 565 725 430 730
+             Q 290 725 200 660
+             Q 145 590 145 490
+             Q 155 400 220 350 Z"
+          fill="url(#ic-body)"
+          stroke="#9bc8de" stroke-opacity="0.5" stroke-width="1.2"/>
+
+    <!-- Tip above water -->
+    <polygon points="360,350 395,320 425,290 445,290 465,320 500,350"
+             fill="url(#ic-tip)" opacity="0.95"
+             stroke="#ffffff" stroke-opacity="0.5" stroke-width="0.7"/>
+
+    <!-- Waterline runs through the entire width -->
+    <line x1="0" y1="350" x2="1400" y2="350" stroke="#00c8e8" stroke-opacity="0.6" stroke-width="1"/>
+    <line x1="0" y1="355" x2="1400" y2="355" stroke="#00c8e8" stroke-opacity="0.2" stroke-width="0.6"/>
+  </svg>
+
+  <div class="iceberg-text top">
+    <div class="iceberg-eyebrow">Codified</div>
+    <div class="iceberg-headline">Brand guidelines</div>
+    <div class="iceberg-body">Briefs, brand kits, templates, style guides.</div>
+  </div>
+
+  <div class="iceberg-text bottom">
+    <div class="iceberg-eyebrow">What determines coherence</div>
+    <div class="iceberg-headline">Institutional knowledge</div>
+    <div class="iceberg-body">Strategic intent, past decisions, audience knowledge,<br>why things worked, what the brand learned.</div>
+  </div>
+</div>
+
+<!-- ═══ S4: BRAND GRAVITY DIAGRAM ═══ -->
+<div class="slide fullbleed" id="s4">
+  <div class="bg"></div>
+  <div class="glow" style="background:rgba(0,232,122,0.11);width:500px;height:500px;top:50%;left:50%;transform:translate(-50%,-50%);position:absolute;"></div>
+
+  <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 1400 760" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="s4orb" cx="38%" cy="33%" r="65%">
+        <stop offset="0%" stop-color="#00e87a" stop-opacity="0.35"/>
+        <stop offset="45%" stop-color="#00e87a" stop-opacity="0.12"/>
+        <stop offset="75%" stop-color="#00e87a" stop-opacity="0.025"/>
+        <stop offset="100%" stop-color="#00e87a" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="s4gf">
+        <feGaussianBlur stdDeviation="8" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <circle cx="700" cy="380" r="230" fill="none" stroke="#00e87a" stroke-opacity="0.06" stroke-width="1">
+      <animate attributeName="r" values="225;237;225" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="700" cy="380" r="200" fill="none" stroke="#00e87a" stroke-opacity="0.09" stroke-width="1">
+      <animate attributeName="r" values="198;210;198" dur="5s" begin="0.8s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Left connector lines: each ends at orb edge at the y of its item -->
+    <line x1="415" y1="277" x2="584" y2="277" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.32;0.12" dur="2.4s" repeatCount="indefinite"/></line>
+    <line x1="415" y1="314" x2="560" y2="314" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.32;0.12" dur="2.8s" begin="0.3s" repeatCount="indefinite"/></line>
+    <line x1="415" y1="351" x2="548" y2="351" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.32;0.12" dur="2.2s" begin="0.6s" repeatCount="indefinite"/></line>
+    <line x1="415" y1="388" x2="545" y2="388" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.32;0.12" dur="3s" begin="0.9s" repeatCount="indefinite"/></line>
+    <line x1="415" y1="425" x2="552" y2="425" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.32;0.12" dur="2.6s" begin="1.1s" repeatCount="indefinite"/></line>
+    <line x1="415" y1="462" x2="568" y2="462" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.32;0.12" dur="2.4s" begin="1.4s" repeatCount="indefinite"/></line>
+
+    <!-- Right connector lines: each ends at orb edge at the y of its item (8 lines for items 1-8 of 9) -->
+    <line x1="808" y1="269" x2="1000" y2="269" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2.6s" begin="0.5s" repeatCount="indefinite"/></line>
+    <line x1="832" y1="299" x2="1000" y2="299" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2s" begin="0.2s" repeatCount="indefinite"/></line>
+    <line x1="846" y1="329" x2="1000" y2="329" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2.4s" begin="0.8s" repeatCount="indefinite"/></line>
+    <line x1="854" y1="359" x2="1000" y2="359" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2.2s" begin="0.4s" repeatCount="indefinite"/></line>
+    <line x1="855" y1="389" x2="1000" y2="389" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2.8s" begin="1.1s" repeatCount="indefinite"/></line>
+    <line x1="850" y1="419" x2="1000" y2="419" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2.6s" begin="0.6s" repeatCount="indefinite"/></line>
+    <line x1="839" y1="449" x2="1000" y2="449" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="3s" begin="0.3s" repeatCount="indefinite"/></line>
+    <line x1="819" y1="479" x2="1000" y2="479" stroke="#00e87a" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2.4s" begin="0.9s" repeatCount="indefinite"/></line>
+
+    <circle cx="700" cy="380" r="155" fill="url(#s4orb)" stroke="#00e87a" stroke-opacity="0.5" stroke-width="1.2" filter="url(#s4gf)">
+      <animate attributeName="stroke-opacity" values="0.38;0.62;0.38" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <text x="700" y="370" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="28" font-weight="700" fill="#00e87a" letter-spacing="5" text-transform="uppercase">BRAND</text>
+    <text x="700" y="408" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="28" font-weight="700" fill="#00e87a" letter-spacing="5" text-transform="uppercase">GRAVITY</text>
+
+    <text x="390" y="228" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="14" fill="#b5b5d0" letter-spacing="2.5">WHAT THE BRAND KNOWS</text>
+    <text x="390" y="288" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="32" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">BRAND STRATEGY</text>
+    <text x="390" y="325" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="32" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">CORE CONCEPT</text>
+    <text x="390" y="362" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="32" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">AUDIENCE PROFILES</text>
+    <text x="390" y="399" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="32" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">DESIGN SYSTEMS</text>
+    <text x="390" y="436" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="32" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">PROOF &amp; CONSTRAINTS</text>
+    <text x="390" y="473" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="32" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">BUSINESS INTELLIGENCE</text>
+    <text x="390" y="510" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="32" font-weight="700" fill="rgba(0,232,122,0.4)" letter-spacing="6">&middot; &middot; &middot;</text>
+
+    <text x="1010" y="198" text-anchor="start" font-family="'IBM Plex Mono',monospace" font-size="14" fill="#b5b5d0" letter-spacing="2.5">INTELLIGENCE → REAL-TIME WORK</text>
+    <text x="1010" y="278" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="26" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">BRIEFING</text>
+    <text x="1010" y="308" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="26" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">COPYWRITING &amp; VOICE</text>
+    <text x="1010" y="338" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="26" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">CONCEPTING</text>
+    <text x="1010" y="368" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="26" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">COHERENCE &amp; QA</text>
+    <text x="1010" y="398" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="26" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">MEDIA PLANNING</text>
+    <text x="1010" y="428" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="26" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">SOCIAL COHERENCE</text>
+    <text x="1010" y="458" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="26" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">GENERATIVE AI</text>
+    <text x="1010" y="488" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="26" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">CONTENT &amp; COMMS</text>
+    <text x="1010" y="518" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="26" font-weight="700" fill="rgba(0,232,122,0.4)" letter-spacing="6">&middot; &middot; &middot;</text>
+  </svg>
+</div>
+
+<!-- ═══ S5: LIVE EXAMPLES (Gravity proof) ═══ -->
+<div class="slide" id="s5">
+  <div class="bg"></div>
+  <div class="glow" style="background:rgba(0,232,122,0.06);width:600px;height:600px;top:-100px;right:-100px;"></div>
+
+  <div class="ey">Brand Gravity &middot; Live examples</div>
+
+  <div class="proof-grid">
+    <div class="proof-card">
+      <div class="proof-card-header">
+        <div class="proof-card-name">RSG</div>
+      </div>
+      <img class="proof-card-img" src="images/RSG-Copilot.png" alt="RSG creative copilot">
+      <div class="proof-card-body"><strong>Live production intelligence.</strong> Multi-property brand standards held across a complex casino portfolio. Brand routing and decision logic running in production.</div>
+    </div>
+
+    <div class="proof-card">
+      <div class="proof-card-header">
+        <div class="proof-card-name">Hamilton Beach</div>
+      </div>
+      <img class="proof-card-img" src="images/HB-Nucleus.png" alt="Hamilton Beach context package">
+      <div class="proof-card-body"><strong>Complete pitch nucleus, deployed live in a presentation.</strong> Brand strategy, audience profiles, creative intention &mdash; encoded and queryable in front of the client, on the day of the pitch.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S6: FORCES ═══ -->
+<div class="slide" id="s6">
+  <div class="bg"></div>
+  <div class="glow" style="background:rgba(0,200,232,0.08);width:700px;height:700px;top:50%;right:-200px;"></div>
+
+  <div style="position:absolute;top:88px;left:80px;right:80px;">
+    <div class="ey">The extensions</div>
+  </div>
+
+  <div class="forces-wrap-clean">
+    <div>
+      <div class="forces-head">Forces <em>extend</em><br>Brand Gravity.</div>
+    </div>
+
+    <div style="position:relative;height:560px;">
+      <svg viewBox="0 0 600 540" style="width:100%;height:100%;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="f6core" cx="38%" cy="33%" r="65%">
+            <stop offset="0%" stop-color="#00e87a" stop-opacity="0.4"/>
+            <stop offset="50%" stop-color="#00e87a" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#00e87a" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Brand Gravity center -->
+        <circle cx="160" cy="270" r="105" fill="url(#f6core)" stroke="#00e87a" stroke-opacity="0.6" stroke-width="1.4"/>
+        <circle cx="160" cy="270" r="125" fill="none" stroke="#00e87a" stroke-opacity="0.12" stroke-width="1">
+          <animate attributeName="r" values="122;134;122" dur="5s" repeatCount="indefinite"/>
+        </circle>
+        <text x="160" y="263" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="22" font-weight="700" fill="#00e87a" letter-spacing="3">BRAND</text>
+        <text x="160" y="288" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="22" font-weight="700" fill="#00e87a" letter-spacing="3">GRAVITY</text>
+        <text x="160" y="410" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="11" fill="rgba(0,232,122,0.85)" letter-spacing="2.5">CORE SERVICES</text>
+
+        <!-- Force 1: Velocity (LIVE) -->
+        <circle cx="450" cy="135" r="56" fill="rgba(0,200,232,0.16)" stroke="#00c8e8" stroke-opacity="0.75" stroke-width="1.2"/>
+        <text x="450" y="132" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="17" font-weight="700" fill="#00c8e8" letter-spacing="1.5">VELOCITY</text>
+        <text x="450" y="152" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9" fill="rgba(0,200,232,0.8)" letter-spacing="1.5">FORCE · LIVE</text>
+
+        <!-- Force 2: Holistic Search -->
+        <circle cx="500" cy="270" r="52" fill="rgba(0,200,232,0.12)" stroke="#00c8e8" stroke-opacity="0.6" stroke-width="1.1"/>
+        <text x="500" y="262" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="14" font-weight="700" fill="#00c8e8" letter-spacing="1.2">HOLISTIC</text>
+        <text x="500" y="280" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="14" font-weight="700" fill="#00c8e8" letter-spacing="1.2">SEARCH</text>
+        <text x="500" y="298" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9" fill="rgba(0,200,232,0.65)" letter-spacing="1.5">FORCE</text>
+
+        <!-- Force 3: CultureQ -->
+        <circle cx="450" cy="405" r="52" fill="rgba(0,200,232,0.1)" stroke="#00c8e8" stroke-opacity="0.55" stroke-width="1.1"/>
+        <text x="450" y="403" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="16" font-weight="700" fill="#00c8e8" letter-spacing="1.5">CULTUREQ</text>
+        <text x="450" y="423" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9" fill="rgba(0,200,232,0.65)" letter-spacing="1.5">FORCE</text>
+
+        <!-- Connectors -->
+        <path d="M 250 230 Q 340 175 396 140" stroke="#00c8e8" stroke-opacity="0.5" stroke-width="1.3" fill="none" stroke-dasharray="4 4">
+          <animate attributeName="stroke-dashoffset" values="0;-40" dur="3s" repeatCount="indefinite"/>
+        </path>
+        <path d="M 265 270 L 448 270" stroke="#00c8e8" stroke-opacity="0.45" stroke-width="1.3" fill="none" stroke-dasharray="4 4">
+          <animate attributeName="stroke-dashoffset" values="0;-40" dur="3.2s" repeatCount="indefinite"/>
+        </path>
+        <path d="M 250 310 Q 340 365 396 400" stroke="#00c8e8" stroke-opacity="0.4" stroke-width="1.3" fill="none" stroke-dasharray="4 4">
+          <animate attributeName="stroke-dashoffset" values="0;-40" dur="2.8s" repeatCount="indefinite"/>
+        </path>
+
+        <circle r="3" fill="#00e87a"><animateMotion dur="3s" repeatCount="indefinite" path="M 250 230 Q 340 175 396 140"/></circle>
+        <circle r="3" fill="#00e87a"><animateMotion dur="3.2s" repeatCount="indefinite" path="M 265 270 L 448 270"/></circle>
+        <circle r="3" fill="#00e87a"><animateMotion dur="2.8s" repeatCount="indefinite" path="M 250 310 Q 340 365 396 400"/></circle>
+
+        <text x="475" y="500" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="11" fill="rgba(0,200,232,0.85)" letter-spacing="2.5">AGENCY EXTENSIONS</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S7: BRAND VELOCITY DIAGRAM ═══ -->
+<div class="slide fullbleed" id="s7">
+  <div class="bg"></div>
+  <div class="glow" style="background:rgba(0,200,232,0.1);width:500px;height:500px;top:50%;left:50%;transform:translate(-50%,-50%);position:absolute;"></div>
+
+  <div style="position:absolute;top:80px;left:80px;z-index:10;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:800;text-transform:uppercase;letter-spacing:-0.015em;line-height:0.97;color:#00c8e8;">Brand Velocity</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:0.12em;margin-top:10px;">Scaled production · AI-native · Runs on Brand Gravity</div>
+  </div>
+
+  <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 1400 760" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="s7orb" cx="38%" cy="33%" r="65%">
+        <stop offset="0%" stop-color="#00c8e8" stop-opacity="0.32"/>
+        <stop offset="50%" stop-color="#00c8e8" stop-opacity="0.1"/>
+        <stop offset="100%" stop-color="#00c8e8" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="s7gf">
+        <feGaussianBlur stdDeviation="8" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <circle cx="700" cy="410" r="230" fill="none" stroke="#00c8e8" stroke-opacity="0.06" stroke-width="1">
+      <animate attributeName="r" values="225;240;225" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="700" cy="410" r="200" fill="none" stroke="#00c8e8" stroke-opacity="0.1" stroke-width="1">
+      <animate attributeName="r" values="198;213;198" dur="4s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Left connector lines: 4 items, each line ends at orb edge at item y -->
+    <line x1="415" y1="339" x2="568" y2="339" stroke="#00c8e8" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.32;0.12" dur="2.4s" repeatCount="indefinite"/></line>
+    <line x1="415" y1="381" x2="553" y2="381" stroke="#00c8e8" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.32;0.12" dur="2s" begin="0.4s" repeatCount="indefinite"/></line>
+    <line x1="415" y1="423" x2="551" y2="423" stroke="#00c8e8" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.32;0.12" dur="2.8s" begin="0.8s" repeatCount="indefinite"/></line>
+    <line x1="415" y1="465" x2="560" y2="465" stroke="#00c8e8" stroke-opacity="0.12" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.06;0.18;0.06" dur="2.6s" begin="1.1s" repeatCount="indefinite"/></line>
+
+    <!-- Right connector lines: 7 items -->
+    <line x1="801" y1="299" x2="1000" y2="299" stroke="#00c8e8" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2.2s" begin="0.1s" repeatCount="indefinite"/></line>
+    <line x1="827" y1="331" x2="1000" y2="331" stroke="#00c8e8" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="1.8s" begin="0.5s" repeatCount="indefinite"/></line>
+    <line x1="842" y1="363" x2="1000" y2="363" stroke="#00c8e8" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2s" begin="0.9s" repeatCount="indefinite"/></line>
+    <line x1="849" y1="395" x2="1000" y2="395" stroke="#00c8e8" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2.4s" begin="0.3s" repeatCount="indefinite"/></line>
+    <line x1="849" y1="427" x2="1000" y2="427" stroke="#00c8e8" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="2.6s" begin="0.7s" repeatCount="indefinite"/></line>
+    <line x1="842" y1="459" x2="1000" y2="459" stroke="#00c8e8" stroke-opacity="0.22" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.12;0.3;0.12" dur="3s" begin="1.1s" repeatCount="indefinite"/></line>
+    <line x1="826" y1="491" x2="1000" y2="491" stroke="#00c8e8" stroke-opacity="0.12" stroke-width="1" stroke-dasharray="4 6"><animate attributeName="stroke-opacity" values="0.06;0.18;0.06" dur="2.2s" begin="0.2s" repeatCount="indefinite"/></line>
+
+    <circle cx="700" cy="410" r="150" fill="url(#s7orb)" stroke="#00c8e8" stroke-opacity="0.45" stroke-width="1.2" filter="url(#s7gf)">
+      <animate attributeName="stroke-opacity" values="0.3;0.55;0.3" dur="3.5s" repeatCount="indefinite"/>
+    </circle>
+    <text x="700" y="400" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="27" font-weight="700" fill="#00c8e8" letter-spacing="4">PRODUCTION</text>
+    <text x="700" y="432" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="27" font-weight="700" fill="#00c8e8" letter-spacing="4">ENGINE</text>
+
+    <text x="390" y="268" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="13" fill="#b5b5d0" letter-spacing="2.5">WHAT GOES IN</text>
+    <text x="390" y="350" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="34" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">CAMPAIGN CONCEPT</text>
+    <text x="390" y="392" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="34" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">HERO CREATIVE</text>
+    <text x="390" y="434" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="34" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">VISUAL LANGUAGE</text>
+    <text x="390" y="476" text-anchor="end" font-family="'Barlow Condensed',sans-serif" font-size="34" font-weight="700" fill="rgba(240,240,248,0.4)" letter-spacing="0.5">PLATFORM NEEDS</text>
+
+    <text x="1010" y="268" text-anchor="start" font-family="'IBM Plex Mono',monospace" font-size="13" fill="#b5b5d0" letter-spacing="2.5">AT SCALE · WITH BRAND COHERENCE</text>
+    <text x="1010" y="308" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="25" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">SOCIAL VARIANTS</text>
+    <text x="1010" y="340" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="25" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">RETAIL CONTENT</text>
+    <text x="1010" y="372" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="25" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">CRM MODULES</text>
+    <text x="1010" y="404" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="25" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">DCO-READY ASSETS</text>
+    <text x="1010" y="436" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="25" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">3D PRODUCT WORKFLOWS</text>
+    <text x="1010" y="468" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="25" font-weight="700" fill="#f0f0f8" letter-spacing="0.5">RETAIL DESIGN</text>
+    <text x="1010" y="500" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="25" font-weight="700" fill="rgba(240,240,248,0.55)" letter-spacing="0.5">MULTI-SURFACE DESIGN</text>
+    <text x="1010" y="532" text-anchor="start" font-family="'Barlow Condensed',sans-serif" font-size="25" font-weight="700" fill="rgba(0,200,232,0.4)" letter-spacing="6">&middot; &middot; &middot;</text>
+  </svg>
+</div>
+
+<!-- ═══ S8: VELOCITY PROOF ═══ -->
+<div class="slide" id="s8">
+  <div class="bg"></div>
+  <div class="glow" style="background:rgba(0,200,232,0.07);width:700px;height:700px;top:-100px;right:-150px;"></div>
+
+  <div class="ey" style="color:var(--cyan);">Brand Velocity &middot; Live examples</div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:800;text-transform:uppercase;line-height:1;margin-bottom:12px;color:var(--cyan);">This is <em style="font-style:normal;color:var(--text);">built.</em><br>Not a concept.</div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:0.14em;margin-bottom:30px;">Three live engagements · Production today</div>
+
+  <div class="vel-cards">
+    <div class="vel-card">
+      <div class="vel-card-name">RSG</div>
+      <img class="vel-card-img" src="images/RSG-Calendar.png" alt="RSG calendar workflow">
+      <div class="vel-card-desc"><strong>Live.</strong> Calendar automation across a casino portfolio. Brand standards held as volume scales across properties.</div>
+    </div>
+
+    <div class="vel-card">
+      <div class="vel-card-name">Stellantis</div>
+      <img class="vel-card-img" src="images/Stellantis-Tagging.png" alt="Stellantis creative tagging">
+      <div class="vel-card-desc"><strong>Live.</strong> Creative tagging at a volume no human review process could sustain. Quality at scale, not quality or scale.</div>
+    </div>
+
+    <div class="vel-card">
+      <div class="vel-card-name">Serta</div>
+      <video class="vel-card-vid" autoplay loop muted playsinline preload="auto">
+        <source src="videos/serta.mp4" type="video/mp4">
+      </video>
+      <div class="vel-card-desc"><strong>Live.</strong> First-day-in workflow accelerator. New team members onto brand and on-message from day one.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S9: WAYS TO ENGAGE ═══ -->
+<div class="slide" id="s9">
+  <div class="bg"></div>
+  <div class="glow" style="background:rgba(0,232,122,0.05);width:600px;height:600px;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+
+  <div class="ey">The commercial shape</div>
+  <div class="com-head">Ways to <em>engage.</em></div>
+
+  <div class="com-grid">
+    <div class="com-card gravity">
+      <div class="com-card-eyebrow">Version 01</div>
+      <div class="com-card-name">Retainer clients</div>
+
+      <div class="com-mode">
+        <div class="com-mode-label">Brand Gravity is the operating model</div>
+        <div class="com-mode-body">The Core gets stood up at the start of the engagement and feeds every workstream.</div>
+      </div>
+
+      <div class="com-mode">
+        <div class="com-mode-label">Forces priced separately</div>
+        <div class="com-mode-body">Velocity and future Forces price independently &mdash; discounted or enhanced when connected to Gravity.</div>
+      </div>
+    </div>
+
+    <div class="com-card transactional">
+      <div class="com-card-eyebrow">Version 02</div>
+      <div class="com-card-name">Project clients</div>
+
+      <div class="com-mode">
+        <div class="com-mode-label">Services without the center</div>
+        <div class="com-mode-body">Campaigns, projects, and tightly-scoped programs priced the traditional way.</div>
+      </div>
+
+      <div class="com-mode">
+        <div class="com-mode-label">Instrument benefit flows through</div>
+        <div class="com-mode-body">Our teams use the instruments internally, so clients feel the speed and quality without being hooked into the Core.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S10: BRAND GRAVITY COMPOUNDS ═══ -->
+<div class="slide" id="s10">
+  <div class="bg"></div>
+  <div class="glow" style="background:rgba(0,232,122,0.06);width:600px;height:600px;top:-150px;left:-150px;"></div>
+  <div class="glow" style="background:rgba(0,200,232,0.05);width:500px;height:500px;bottom:-100px;right:-100px;"></div>
+
+  <div class="compound-wrap">
+    <div class="compound-head">
+      <em>Brand Gravity</em> is how brands<br>
+      get more coherent as they scale.
+    </div>
+
+    <div class="compound-fig">
+      <svg viewBox="0 0 1100 460" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="s10orb" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#00e87a" stop-opacity="0.4"/>
+            <stop offset="60%" stop-color="#00e87a" stop-opacity="0.1"/>
+            <stop offset="100%" stop-color="#00e87a" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <circle cx="200" cy="230" r="80" fill="url(#s10orb)" stroke="#00e87a" stroke-opacity="0.6" stroke-width="1.4"/>
+        <circle cx="200" cy="230" r="100" fill="none" stroke="#00e87a" stroke-opacity="0.12" stroke-width="1">
+          <animate attributeName="r" values="98;108;98" dur="5s" repeatCount="indefinite"/>
+        </circle>
+        <text x="200" y="225" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="22" font-weight="700" fill="#00e87a" letter-spacing="3">BRAND</text>
+        <text x="200" y="250" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="22" font-weight="700" fill="#00e87a" letter-spacing="3">PROMISE</text>
+        <text x="200" y="350" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="11" fill="rgba(0,232,122,0.85)" letter-spacing="2.5">THE CENTER</text>
+
+        <!-- Connector rays -->
+        <g stroke="#00e87a" stroke-opacity="0.22" stroke-width="0.7" fill="none">
+          <path d="M 280 230 L 1020 60"/>
+          <path d="M 280 210 L 1020 110"/>
+          <path d="M 280 200 L 1020 160"/>
+          <path d="M 280 230 L 1020 230"/>
+          <path d="M 280 250 L 1020 300"/>
+          <path d="M 280 260 L 1020 360"/>
+          <path d="M 280 230 L 1020 410"/>
+        </g>
+
+        <!-- Touchpoint mesh -->
+        <g fill="#00c8e8">
+          <circle cx="420" cy="120" r="2" opacity="0.4"/>
+          <circle cx="540" cy="95" r="2" opacity="0.45"/>
+          <circle cx="660" cy="80" r="2" opacity="0.5"/>
+          <circle cx="780" cy="70" r="2" opacity="0.55"/>
+          <circle cx="900" cy="65" r="2.5" opacity="0.6"/>
+          <circle cx="1020" cy="60" r="3" opacity="0.7"/>
+
+          <circle cx="430" cy="160" r="2" opacity="0.4"/>
+          <circle cx="550" cy="145" r="2" opacity="0.45"/>
+          <circle cx="670" cy="135" r="2" opacity="0.5"/>
+          <circle cx="790" cy="125" r="2" opacity="0.55"/>
+          <circle cx="910" cy="118" r="2.5" opacity="0.6"/>
+          <circle cx="1020" cy="110" r="3" opacity="0.7"/>
+
+          <circle cx="430" cy="195" r="2" opacity="0.4"/>
+          <circle cx="555" cy="185" r="2" opacity="0.45"/>
+          <circle cx="680" cy="175" r="2" opacity="0.5"/>
+          <circle cx="800" cy="170" r="2" opacity="0.55"/>
+          <circle cx="910" cy="165" r="2.5" opacity="0.6"/>
+          <circle cx="1020" cy="160" r="3" opacity="0.75"/>
+
+          <circle cx="420" cy="230" r="2" opacity="0.4"/>
+          <circle cx="550" cy="230" r="2" opacity="0.45"/>
+          <circle cx="680" cy="230" r="2" opacity="0.5"/>
+          <circle cx="800" cy="230" r="2" opacity="0.55"/>
+          <circle cx="910" cy="230" r="2.5" opacity="0.6"/>
+          <circle cx="1020" cy="230" r="3" opacity="0.78"/>
+
+          <circle cx="430" cy="265" r="2" opacity="0.4"/>
+          <circle cx="555" cy="275" r="2" opacity="0.45"/>
+          <circle cx="680" cy="285" r="2" opacity="0.5"/>
+          <circle cx="800" cy="290" r="2" opacity="0.55"/>
+          <circle cx="910" cy="295" r="2.5" opacity="0.6"/>
+          <circle cx="1020" cy="300" r="3" opacity="0.7"/>
+
+          <circle cx="430" cy="305" r="2" opacity="0.4"/>
+          <circle cx="555" cy="320" r="2" opacity="0.45"/>
+          <circle cx="680" cy="335" r="2" opacity="0.5"/>
+          <circle cx="800" cy="345" r="2" opacity="0.55"/>
+          <circle cx="910" cy="355" r="2.5" opacity="0.6"/>
+          <circle cx="1020" cy="360" r="3" opacity="0.7"/>
+
+          <circle cx="430" cy="350" r="2" opacity="0.4"/>
+          <circle cx="555" cy="370" r="2" opacity="0.45"/>
+          <circle cx="680" cy="385" r="2" opacity="0.5"/>
+          <circle cx="800" cy="395" r="2" opacity="0.55"/>
+          <circle cx="910" cy="405" r="2.5" opacity="0.6"/>
+          <circle cx="1020" cy="410" r="3" opacity="0.7"/>
+        </g>
+
+        <!-- Travelling pulses -->
+        <g fill="#00e87a">
+          <circle r="2.5"><animateMotion dur="3s" repeatCount="indefinite" path="M 280 230 L 1020 230"/></circle>
+          <circle r="2.5"><animateMotion dur="3.4s" begin="0.4s" repeatCount="indefinite" path="M 280 200 L 1020 160"/></circle>
+          <circle r="2.5"><animateMotion dur="3.2s" begin="0.8s" repeatCount="indefinite" path="M 280 250 L 1020 300"/></circle>
+          <circle r="2.5"><animateMotion dur="3.6s" begin="1.1s" repeatCount="indefinite" path="M 280 230 L 1020 410"/></circle>
+        </g>
+
+        <text x="900" y="445" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="11" fill="rgba(0,200,232,0.85)" letter-spacing="2.5">A THOUSAND TOUCHPOINTS</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+</div><!-- end deck -->
+
+<script>
+const TOTAL = 10;
+let cur = 0;
+const slides = [];
+const dotEls = [];
+
+function init() {
+  for (let i = 1; i <= TOTAL; i++) slides.push(document.getElementById('s' + i));
+  const dc = document.getElementById('dots');
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.addEventListener('click', () => go(i));
+    dc.appendChild(d);
+    dotEls.push(d);
+  }
+  go(0);
+  kickVideos();
+}
+
+function go(n) {
+  if (n < 0 || n >= TOTAL) return;
+  if (slides[cur]) slides[cur].classList.remove('on');
+  if (dotEls[cur]) dotEls[cur].classList.remove('on');
+  cur = n;
+  slides[cur].classList.add('on');
+  dotEls[cur].classList.add('on');
+  document.getElementById('ctr').textContent = (cur + 1) + ' / ' + TOTAL;
+  slides[cur].querySelectorAll('video').forEach(v => { try { v.play(); } catch(e){} });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); go(cur - 1); }
+  else if (e.key === 'Home') go(0);
+  else if (e.key === 'End') go(TOTAL - 1);
+});
+
+let tx = 0;
+document.addEventListener('touchstart', (e) => { tx = e.touches[0].clientX; });
+document.addEventListener('touchend', (e) => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1));
+});
+
+function kickVideos() {
+  document.querySelectorAll('video').forEach(v => {
+    v.muted = true;
+    const p = v.play();
+    if (p && p.catch) p.catch(() => {});
+  });
+}
+window.addEventListener('load', kickVideos);
+['click', 'keydown', 'touchstart', 'pointerdown'].forEach(ev => {
+  document.addEventListener(ev, kickVideos);
+});
+
+init();
+</script>
+
+</body>
+</html>
